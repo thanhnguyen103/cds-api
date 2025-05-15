@@ -1,0 +1,81 @@
+# .NET build results
+bin/
+obj/
+out/
+
+# User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Mono Auto Generated Files
+mono_crash.*
+
+# Build results of VS Code
+.vscode/
+
+# ASP.NET Scaffolding
+ScaffoldingReadMe.txt
+
+# Publish results
+*.publish.xml
+
+# NuGet Packages
+*.nupkg
+# The packages folder can be ignored because of Package Restore
+**/packages/*
+!**/packages/build/
+!**/packages/repositories.config
+
+# NPM Packages
+node_modules/
+
+# Visual Studio Code settings
+.vscode/
+
+# DotCover
+*.dotCover
+
+# Rider
+.idea/
+
+# Logs
+*.log
+
+# Others
+*.dbmdl
+*.pdb
+*.cache
+*.mdb
+*.bak
+*.backup
+*.swp
+*.tmp
+*.temp
+
+# Azure Pipelines
+.azure-pipelines/
+
+# Local test results
+TestResults/
+*.trx
+
+# Resharper
+_ReSharper*/
+*.[Rr]e[Ss]harper
+
+# SonarQube
+.sonar/
+
+# Coverage
+coverage/
+*.coverage
+*.coveragexml
+
+# StyleCop
+StyleCopReport.xml
+
+# JetBrains Rider
+.idea/
+*.sln.iml

@@ -1,0 +1,21 @@
+# Mock request for token generation (Keycloak)
+curl -X POST \
+  http://localhost:8080/realms/entra-mock-realm/protocol/openid-connect/token \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  -d "grant_type=client_credentials" \
+  -d "client_id=my-backend-service" \
+  -d "client_secret=<your-client-secret>" \
+  -d "audience=my-protected-api" \
+  -d "scope=openid"
+
+
+# Mock request for token generation (Azure Entra ID))
+
+curl -X POST \
+  https://login.microsoftonline.com/tenant-id/oauth2/v2.0/token \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  -d "grant_type=client_credentials" \
+  -d "client_id=<your-client-id>" \
+  -d "client_secret=<your-client-secret>" \
+  -d "audience=<your-audience>" \
+  -d "scope=api://<your-audience>/.default"
