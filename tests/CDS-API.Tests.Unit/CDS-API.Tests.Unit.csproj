@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <PackageReference Include="coverlet.collector" Version="6.0.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="9.0.5" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
     <PackageReference Include="Moq" Version="4.20.72" />
     <PackageReference Include="xunit" Version="2.9.2" />
@@ -22,6 +23,12 @@
 
   <ItemGroup>
     <Folder Include="Application\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\CDS-API.Application\CDS-API.Application.csproj" />
+    <ProjectReference Include="..\..\src\CDS-API.Domain\CDS-API.Domain.csproj" />
+    <ProjectReference Include="..\..\src\CDS-API.Infrastructure\CDS-API.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>
