@@ -1,36 +1,29 @@
-﻿# Use the official .NET SDK image as a build stage
+﻿# Use the official .NET SDK image for build
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+WORKDIR /src
 
-# Set the working directory
-WORKDIR /app
-
-# Copy the project files
-COPY CDS-API.Api/*.csproj ./CDS-API.Api/
-COPY CDS-API.Application/*.csproj ./CDS-API.Application/
-COPY CDS-API.Domain/*.csproj ./CDS-API.Domain/
-
-# Restore dependencies
+# Copy solution and restore as distinct layers
+COPY ./src/CDS-API.Api/CDS-API.Api.csproj ./CDS-API.Api/
+COPY ./src/CDS-API.Domain/CDS-API.Domain.csproj ./CDS-API.Domain/
+COPY ./src/CDS-API.Application/CDS-API.Application.csproj ./CDS-API.Application/
+COPY ./src/CDS-API.Infrastructure/CDS-API.Infrastructure.csproj ./CDS-API.Infrastructure/
 RUN dotnet restore ./CDS-API.Api/CDS-API.Api.csproj
 
-# Copy the rest of the application files
-COPY CDS-API.Api/ ./CDS-API.Api/
-COPY CDS-API.Application/ ./CDS-API.Application/
-COPY CDS-API.Domain/ ./CDS-API.Domain/
+# Copy the rest of the source code
+COPY ./src/ ./ 
 
-# Build the application
-RUN dotnet publish ./CDS-API.Api/CDS-API.Api.csproj -c Release -o /app/publish
+WORKDIR /src/CDS-API.Api
+RUN dotnet publish -c Release -o /app/publish
 
-# Use the official .NET runtime image as the runtime stage
-FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS runtime
-
-# Set the working directory
+# Build runtime image
+FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS final
 WORKDIR /app
-
-# Copy the published files from the build stage
 COPY --from=build /app/publish .
 
-# Expose the port the application runs on
+# Expose port (change if your app uses a different port)
 EXPOSE 80
 
-# Set the entry point for the application
+# Set environment variables if needed
+# ENV ASPNETCORE_ENVIRONMENT=Production
+
 ENTRYPOINT ["dotnet", "CDS-API.Api.dll"]

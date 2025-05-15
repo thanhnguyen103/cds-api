@@ -157,6 +157,12 @@ If the action is obvious from the context (e.g., for simple DTOs), you can use `
 - `CreateCourseRequest`, `CreateCourseResponse`
 - `CourseDto`, `CourseDetailsDto`
 
+### Build the image
+
+```bash
+podman build --pull --rm -f docker/Dockerfile -t cdsapi:latest . 
+```
+
 ### Validations for the Request models
 
 If the validation logic is sophisticated, you should:
