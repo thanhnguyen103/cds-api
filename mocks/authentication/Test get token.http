@@ -12,10 +12,10 @@ curl -X POST \
 # Mock request for token generation (Azure Entra ID))
 
 curl -X POST \
-  https://login.microsoftonline.com/tenant-id/oauth2/v2.0/token \
+  https://login.microsoftonline.com/c85cf441-43e9-4227-8c02-ff4534b89e68/oauth2/v2.0/token \
   -H "Content-Type: application/x-www-form-urlencoded" \
   -d "grant_type=client_credentials" \
-  -d "client_id=<your-client-id>" \
+  -d "client_id=9af7cdac-8b96-4412-b680-11dda211a69a" \
   -d "client_secret=<your-client-secret>" \
-  -d "audience=<your-audience>" \
-  -d "scope=api://<your-audience>/.default"
+  -d "audience=3bd21aeb-6102-4963-b9fd-25e27f196de0" \
+  -d "scope=api://3bd21aeb-6102-4963-b9fd-25e27f196de0/.default"

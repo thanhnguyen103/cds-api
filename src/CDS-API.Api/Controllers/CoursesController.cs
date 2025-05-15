@@ -1,9 +1,14 @@
+using Asp.Versioning;
 using CDS_API.Application.DTOs;
 using CDS_API.Application.Services;
 using Microsoft.AspNetCore.Mvc;
 
+/// <summary>
+/// Handles course-related operations.
+/// </summary>
 [ApiController]
-[Route("api/[controller]")]
+[ApiVersion("1.0")]
+[Route("api/v{version:apiVersion}/[controller]")]
 public class CoursesController : ControllerBase
 {
     private readonly ICourseService _courseService;
@@ -13,8 +18,20 @@ public class CoursesController : ControllerBase
         _courseService = courseService;
     }
 
+    /// <summary>
+    /// Retrieves a list of courses matching the given criteria.
+    /// </summary>
+    /// <param name="request">Filter criteria for courses.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>A list of courses or an error message.</returns>
+    /// <response code="200">Returns the list of courses.</response>
+    /// <response code="400">If the request is invalid.</response>
+    /// <response code="404">If no courses are found.</response>
     [HttpGet]
-    public async Task<IActionResult> GetCourses([FromBody] GetCoursesRequest request, CancellationToken cancellationToken)
+    [ProducesResponseType(typeof(IEnumerable<GetCoursesResponse>), 200)]
+    [ProducesResponseType(400)]
+    [ProducesResponseType(404)]
+    public async Task<IActionResult> GetCourses([FromQuery] GetCoursesRequest request, CancellationToken cancellationToken)
     {
         if (request == null)
         {

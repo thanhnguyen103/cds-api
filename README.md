@@ -4,7 +4,7 @@
 
 | Name                    | Description                                                      |
 |-------------------------|------------------------------------------------------------------|
-| Azure Entra ID          | Identity provider for authentication and authorization.<br>Mocked by [Keycloak](./docs/mocks/authentication/Keycloak%20setup.md) for local development/testing. |
+| Azure Entra ID          | Identity provider for authentication and authorization.<br>Mocked by [Keycloak](./mocks/authentication/Keycloak%20setup.md) for local development/testing. |
 | Azure SQL Database      | Provides read-only access to application data.                   |
 | Azure Application Insights | Logging and monitoring. |
 
@@ -216,6 +216,135 @@ public IActionResult GetCourses([FromBody] GetCoursesRequest request)
 - Keep validation logic out of controllers.
 - Return standardized error responses automatically.
 
+#### Example request
+```bash
+curl -X GET \
+  http://localhost:5554/api/courses \
+  -H "Authorization: Bearer <access_token>"
+```
+
+#### Example response
+```text
+HTTP/1.1 400 Bad Request
+Connection: close
+Content-Type: application/problem+json; charset=utf-8
+Date: Thu, 15 May 2025 03:51:47 GMT
+Server: Kestrel
+Transfer-Encoding: chunked
+
+{
+  "type": "https://tools.ietf.org/html/rfc9110#section-15.5.1",
+  "title": "One or more validation errors occurred.",
+  "status": 400,
+  "errors": {
+    "": [
+      "Missing conditional field, must provide at least 1"
+    ]
+  },
+  "traceId": "00-6299419dcaa071bea7f9faa9fff909cd-849a7cda5e244620-01"
+}
+```
+
+### Document your API for OpenAPI
+
+To document your API for OpenAPI (Swagger) in ASP.NET Core, use XML comments and [Swashbuckle.AspNetCore](https://github.com/domaindrivendev/Swashbuckle.AspNetCore) or [NSwag](https://github.com/RicoSuter/NSwag). Here’s how you can do it:
+
+---
+
+#### 1. Add XML Comments to Your Controller and DTOs
+
+```csharp
+/// <summary>
+/// Handles course-related operations.
+/// </summary>
+[ApiController]
+[ApiVersion("1.0")]
+[Route("api/v{version:apiVersion}/[controller]")]
+public class CoursesController : ControllerBase
+{
+    // ...existing code...
+
+    /// <summary>
+    /// Retrieves a list of courses matching the given criteria.
+    /// </summary>
+    /// <param name="request">Filter criteria for courses.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>A list of courses or an error message.</returns>
+    /// <response code="200">Returns the list of courses.</response>
+    /// <response code="400">If the request is invalid.</response>
+    /// <response code="404">If no courses are found.</response>
+    [HttpGet]
+    [ProducesResponseType(typeof(IEnumerable<GetCoursesResponse>), 200)]
+    [ProducesResponseType(400)]
+    [ProducesResponseType(404)]
+    public async Task<IActionResult> GetCourses([FromQuery] GetCoursesRequest request, CancellationToken cancellationToken)
+    {
+        // ...existing code...
+    }
+}
+```
+
+---
+
+#### 2. Enable XML Comments in Your Project
+
+- In your `.csproj` file, add:
+
+    ```xml
+    <PropertyGroup>
+      <GenerateDocumentationFile>true</GenerateDocumentationFile>
+      <NoWarn>$(NoWarn);1591</NoWarn>
+    </PropertyGroup>
+    ```
+
+---
+
+#### 3. Configure Swagger to Use XML Comments
+
+- In `Program.cs` or `Startup.cs`:
+
+    ```csharp
+    var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+    builder.Services.AddSwaggerGen(c =>
+    {
+        c.IncludeXmlComments(xmlPath);
+    });
+    ```
+
+---
+
+#### 4. Add Descriptions to DTOs
+
+```csharp
+/// <summary>
+/// Request model for filtering courses.
+/// </summary>
+public class GetCoursesRequest
+{
+    /// <summary>
+    /// Filter by course title (optional).
+    /// </summary>
+    public string? CourseTitle { get; set; }
+
+    /// <summary>
+    /// Filter by course code (optional).
+    /// </summary>
+    public string? CourseCode { get; set; }
+}
+```
+
+---
+
+**Summary:**  
+
+- Use XML comments on controllers, actions, and DTOs.
+- Enable XML docs in your project.
+- Configure Swagger to read XML comments.
+- Use `[ProducesResponseType]` for response documentation.
+
+This will generate rich, discoverable OpenAPI docs for your API.
+
 ### Data Mapping
 
 You should put the AutoMapper mapping profile in the **CDS-API.Application** project, typically in a folder named `Mappings` or `Profiles`.
@@ -240,3 +369,8 @@ CDS-API.Application/
 
 - Place mapping profiles (e.g., `CourseProfile`) in `CDS-API.Application/Mappings` (or `Profiles`).  
 - Register the profiles in your DI setup (usually in CDS-API.Api).
+
+## Database Setup
+
+For local development and testing, you can use the [Mock database setup](./mocks/database/Mock%20database%20setup.md) guide.  
+A sample schema and seed data can be found in [script.sql](./mocks/database/script.sql).

@@ -1,3 +1,5 @@
+using System.Reflection;
+using Asp.Versioning;
 using Azure.Monitor.OpenTelemetry.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
@@ -151,5 +153,63 @@ public static class Extensions
         }
 
         return app;
+    }
+
+    public static TBuilder AddSwaggerWithXmlComments<TBuilder>(this TBuilder builder) where TBuilder : IHostApplicationBuilder
+    {
+        var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+        var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+
+        var applicationXmlFile = $"{typeof(CDS_API.Application.Mappings.CourseProfile).Assembly.GetName().Name}.xml";
+        var applicationXmlPath = Path.Combine(AppContext.BaseDirectory, applicationXmlFile);
+
+        builder.Services.AddSwaggerGen(c =>
+        {
+            c.IncludeXmlComments(xmlPath);
+            c.IncludeXmlComments(applicationXmlPath);
+        });
+
+        return builder;
+    }
+
+    public static TBuilder AddApiVersioning<TBuilder>(this TBuilder builder) where TBuilder : IHostApplicationBuilder
+    {
+        builder.Services.AddApiVersioning(options =>
+        {
+            // ReportApiVersions will add the api-supported-versions and api-deprecated-versions headers.
+            options.ReportApiVersions = true;
+
+            // Automatically applies an API version based on the default if no version is specified.
+            options.AssumeDefaultVersionWhenUnspecified = true;
+            
+            options.DefaultApiVersion = new ApiVersion(1, 0); // Default to version 1.0
+
+            // Configure how the API version is read from the request.
+            // Common strategies:
+            options.ApiVersionReader = ApiVersionReader.Combine(
+                new UrlSegmentApiVersionReader(), // e.g., /api/v1/resource
+                new QueryStringApiVersionReader("api-version"), // e.g., /api/resource?api-version=1.0
+                new HeaderApiVersionReader("X-Version"), // e.g., X-Version: 1.0 in request header
+                new MediaTypeApiVersionReader("ver") // e.g., Accept: application/json;ver=1.0
+            );
+        })
+        // Add API Explorer services for OpenAPI/Swagger integration
+        .AddMvc(options =>
+        {
+            // If using Asp.Versioning.Mvc
+        })
+        .AddApiExplorer(options =>
+        {
+            // Format the version as "v{major}.{minor}" (e.g., "v1.0").
+            options.GroupNameFormat = "'v'VVV";
+
+            // Note: By default, IApiVersionDescriptionProvider generates groups
+            // in descending order. To VVVvor them in ascending order, set since
+            // IApiVersionDescriptionProvider now reverses the versions
+            // to ensure that the latest version is presented first by default.
+            options.SubstituteApiVersionInUrl = true;
+        });
+
+        return builder;
     }
 }
